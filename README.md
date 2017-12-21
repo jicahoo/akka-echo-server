@@ -5,6 +5,9 @@ As title. For now, it provided a runnable code for Akka offical doc: https://doc
 * Start Server.ServerApp
 * Start Client.DriveClient
 
+## Architecture
+  ![screenshot](https://www.lucidchart.com/publicSegments/view/39b0a770-82cd-4078-b1ff-6ab6ee63ffc8/image.png "Logo Title Text 1")
+
 ## References
 * https://gist.github.com/masahitojp/4373489
 * https://doc.akka.io/docs/akka/2.5/io-tcp.html?language=scala
