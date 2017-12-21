@@ -10,6 +10,7 @@ import akka.util.ByteString
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
+
 object DriveClient extends App {
   println("OK")
   val socket = new InetSocketAddress("127.0.0.1", 8000)
@@ -21,10 +22,10 @@ object DriveClient extends App {
 }
 
 class ResponseListener extends Actor {
-  override def receive = {
+  override def receive: PartialFunction[Any, Unit] = {
     case s: String => println(s)
     case Connected(remote, local) => {
-      println("Connected")
+      println(s"Client Connected. Remote: $remote, Local: $local.")
       val client = sender()
       client ! ByteString.fromString("Hello")
     }
@@ -45,19 +46,19 @@ class Client(remote: InetSocketAddress, listener: ActorRef) extends Actor {
 
   IO(Tcp) ! Connect(remote)
 
-  def receive = {
+  def receive: PartialFunction[Any, Unit] = {
     case CommandFailed(_: Connect) ⇒
       listener ! "connect failed"
       context stop self
 
-    case c @ Connected(remote, local) ⇒
-      listener ! c
+    case conn@Connected(`remote`, _) ⇒
+      listener ! conn
       val connection = sender()
       connection ! Register(self)
       context become {
         case data: ByteString ⇒
           connection ! Write(data)
-        case CommandFailed(w: Write) ⇒
+        case CommandFailed(_: Write) ⇒
           // O/S buffer was full
           listener ! "write failed"
         case Received(data) ⇒

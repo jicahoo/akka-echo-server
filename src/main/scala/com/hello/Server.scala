@@ -21,16 +21,19 @@ class Server extends Actor {
   import context.system
 
   println("Before IO(Tcp)")
-  IO(Tcp) ! Bind(self, new InetSocketAddress("localhost", 8000))
+  val tcpManager = IO(Tcp)
+  tcpManager ! Bind(self, new InetSocketAddress("localhost", 8000))
+  println(s"what object is a ${tcpManager.getClass}")
   println("Done")
 
-  def receive = {
+  def receive: Actor.Receive = {
     case b@Bound(localAddress) ⇒
       context.parent ! b
 
     case CommandFailed(_: Bind) ⇒ context stop self
 
-    case c@Connected(remote, local) ⇒
+    case conn@Connected(remote, local) ⇒
+      println(s"Server Connected. Remote: $remote, Local: $local.")
       val handler = context.actorOf(Props[SimplisticHandler])
       val connection = sender()
       connection ! Register(handler)
@@ -42,12 +45,11 @@ class SimplisticHandler extends Actor {
 
   import Tcp._
 
-  def receive = {
-    case Received(data) ⇒ {
-      println(s"Got data:")
+  def receive:Actor.Receive = {
+    case Received(data) ⇒
+      println(s"Got data. Data type: ${data.getClass}")
       println(data.map(b => b.toChar).mkString)
       sender() ! Write(data)
-    }
-    case PeerClosed ⇒ context stop self
+    case  PeerClosed ⇒ context stop self
   }
 }
