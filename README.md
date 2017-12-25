@@ -14,7 +14,9 @@ As title. For now, it provided a runnable code for Akka offical doc: https://doc
 
 ## Push-reading 和 Pull-Reading
 * akka官方文档：https://doc.akka.io/docs/akka/current/io-tcp.html 提出了两种模式Pull Reading 和 Push Reading.
-* Push Readinng: 数据到了Connection Actor, Connection Actor就会将数据发送给注册的Actor；注册的Actor，觉得有压力，可以发送SuspendReading给Connection Actor, Conncetion Actor就不再发送，知道注册的Actor又发了一个ResumeReading消息给Connection Actor.
+* Push Readinng: Connection Actor很积极，有数据到了，立马发送给已注册的Actor。“不用你说，我就给你发数据；你说停我就停，你说开始我再开始”。数据到了Connection Actor, Connection Actor就会将数据发送给注册的Actor；注册的Actor，觉得有压力，可以发送SuspendReading给Connection Actor, Conncetion Actor就不再发送，知道注册的Actor又发了一个ResumeReading消息给Connection Actor。不用催Connection Actor, 默认Connection Actor会把数据“推送”给你。
+* Pull Reading: Connetion Actor很懒，注册的Actor不说要数据，它就不发送。“要数据的时候，给我说声，我给你。”。 所以说，这个模式是通过给Connection Actor发送ResumeReading消息把数据"拉“过来的。
+
 
 
 ## Architecture
