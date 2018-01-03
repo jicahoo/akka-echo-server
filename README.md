@@ -22,6 +22,8 @@ As title. For now, it provided a runnable code for Akka offical doc: https://doc
 ## 如何处理写的压力？ACK-based, NACK-based, NACK-based with write suspending.
 * 压力在哪？ 
 * ACK-based: 一个一个写，（有些像TCP的一些行为，滑动窗口什么的。）只有当前的写成功了，才能写下一条数据。
+* NACK-based: 写不需要ACK, 尽管写，出错的时候会告诉发送者。由发送者处理失败的写，失败的写消息会包含要写的数据。失败的时候，Connection Actor会继续处理其他写请求。
+* NACK-based with write suspending: 
 
 
 
