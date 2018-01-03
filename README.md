@@ -23,7 +23,7 @@ As title. For now, it provided a runnable code for Akka offical doc: https://doc
 * 压力在哪？ 
 * ACK-based: 一个一个写，（有些像TCP的一些行为，滑动窗口什么的。）只有当前的写成功了，才能写下一条数据。
 * NACK-based: 写不需要ACK, 尽管写，出错的时候会告诉发送者。由发送者处理失败的写，失败的写消息会包含要写的数据。失败的时候，Connection Actor会继续处理其他写请求。
-* NACK-based with write suspending: 
+* NACK-based with write suspending: 某个写请求未能成功完成的时候，Connection Actor会对之后的写请求，返回错误消息？ 当Connection Actor收到ResumeWriting消息的时候，如果最后接受的写请求成功了，ConnectionActor才会返回WritingResumed。那么，Connection Actor才会接受新的写请求。和NACK-based的区别，错误的时候是否暂停处理新的写请求。
 
 
 
