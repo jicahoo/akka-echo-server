@@ -9,7 +9,7 @@ As title. For now, it provided a runnable code for Akka offical doc: https://doc
 * akka io的实现就20多个类：https://github.com/akka/akka/tree/master/akka-actor/src/main/scala/akka/io
 * TcpConnection包装了Java NIO的Channel.
 * DirectBufferPool和ThreadPool的概念类似。如果有可用Buffer,从pool里拿，如果没有就创建一个。
-* 经验: 看代码一定要带着目的去看，没有目的也要找一个目的，去看。看代码不是看散文。有目的你才能，有的放矢，舍弃不关心的，才有效果。不带目的，代码本身就繁杂，肯定耗费精力，也看不出什么结果来。目的一般是从使用者角度来的，这个库提供了什么功能，如何使用这个功能。只有你知道如何使用这个功能，然后再去对应地看某个功能在底层是如何实现的，才有效果。
+* 经验: 看代码一定要带着目的去看，没有目的也要找一个目的，去看。看代码不是看散文。有目的你才能，有的放矢，舍弃不关心的，才有效果。不带目的，代码本身就繁杂，肯定耗费精力，也看不出什么结果来。目的一般是从使用者角度来的，这个库提供了什么功能，如何使用这个功能。只有你知道如何使用这个功能，然后再去对应地看某个功能在底层是如何实现的，才有效果。 如果没有具体问题，也有顺着某个脑海中的用例去看相关的代码，而不要被代码干扰，到处毫无目的的看。
 * TCP.scala中有两种消息： Command和Event. Command一般就是应用程序发起的，Event一般就是操作系统触发的。 Command的例子有, Abort, Bind, Connect, Write; Event的例子有Aborted, Bound, Connected, Receivied，一个有意思的地方是，Event都是完成时态，有完成的意思；而Command都是一般现在时态，有祈使的意味。这也算是好程序的一个特点吧。
 * 一些表述都是站在server这一角度。
 
@@ -21,7 +21,7 @@ As title. For now, it provided a runnable code for Akka offical doc: https://doc
 
 ## 如何处理写的压力？ACK-based, NACK-based, NACK-based with write suspending.
 * 压力在哪？ 
-* ACK-based: 一个一个写，（有些像TCP的一些行为，滑动窗口什么的。）只有当前的写成功了，才能写下一条数据。
+* ACK-based: 一个一个写，（有些像TCP的一些行为，滑动窗口什么的。）只有当前的写成功了，才能写下一条数据。WriteCommand可以带一个Object (不能是Tcp.NoAck)，当写成功了，就会将WriteCommand带的这个Object返回给WriteCommand的发送者。
 * NACK-based: 写不需要ACK, 尽管写，出错的时候会告诉发送者。由发送者处理失败的写，失败的写消息会包含要写的数据。失败的时候，Connection Actor会继续处理其他写请求。
 * NACK-based with write suspending: 某个写请求未能成功完成的时候，Connection Actor会对之后的写请求，返回错误消息？ 当Connection Actor收到ResumeWriting消息的时候，如果最后接受的写请求成功了，ConnectionActor才会返回WritingResumed。那么，Connection Actor才会接受新的写请求。和NACK-based的区别，错误的时候是否暂停处理新的写请求。
 
