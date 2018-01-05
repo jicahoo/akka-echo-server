@@ -21,7 +21,7 @@ As title. For now, it provided a runnable code for Akka offical doc: https://doc
 
 ## 如何处理写的压力？ACK-based, NACK-based, NACK-based with write suspending.
 * 压力在哪？ 
-* ACK-based: 一个一个写，（有些像TCP的一些行为，滑动窗口什么的。）只有当前的写成功了，才能写下一条数据。WriteCommand可以带一个Object (不能是Tcp.NoAck)，当写成功了，就会将WriteCommand带的这个Object返回给WriteCommand的发送者。
+* ACK-based: 一个一个写，（有些像TCP的一些行为，滑动窗口什么的。）只有当前的写成功了，才能写下一条数据。WriteCommand可以带一个Object (不能是Tcp.NoAck)，当写成功了，就会将WriteCommand带的这个Object返回给WriteCommand的发送者。还是要加强阅读理解的能力，无论是中文还是英文，我现在的理解方式都毫无章法，也无耐心，随便看看就自以为理解了，还是要有章法地尝试理解作者的意图，上下文是什么，语法结构是怎样的，代词指的是谁，一些判断的前提条件是什么。原文中的这一句话`every Write command carries an arbitrary object, and if this object is not Tcp.NoAck then it will be returned to the sender of the Write upon successfully writing all contained data to the socket.`虽然复杂，但是确实比较清楚完整地描述了程序行为。 `it`指代的就是WriteCommand携带的Object；这个Object， 当(upon)成功将所有的数据写到Socket的时候，会被返回给Write的发送者(sender)。
 * NACK-based: 写不需要ACK, 尽管写，出错的时候会告诉发送者。由发送者处理失败的写，失败的写消息会包含要写的数据。失败的时候，Connection Actor会继续处理其他写请求。
 * NACK-based with write suspending: 某个写请求未能成功完成的时候，Connection Actor会对之后的写请求，返回错误消息？ 当Connection Actor收到ResumeWriting消息的时候，如果最后接受的写请求成功了，ConnectionActor才会返回WritingResumed。那么，Connection Actor才会接受新的写请求。和NACK-based的区别，错误的时候是否暂停处理新的写请求。
 
